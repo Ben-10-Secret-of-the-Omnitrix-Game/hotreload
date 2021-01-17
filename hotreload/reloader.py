@@ -30,15 +30,15 @@ class Monitor(threading.Thread):
 
 
 class Loader:
-    def __init__(self, source):
+    def __init__(self, source, module, frequency):
         self.source = source
         self.__name = os.path.splitext(self.source)[0]
-        self.module = importlib.import_module(self.__name)
+        self.module = importlib.import_module(module)
         self.fingerprint = None
 
         self.changed = False
 
-        monitor = Monitor(self)
+        monitor = Monitor(self, frequency)
         monitor.start()
 
     def notify(self, fingerprint):
@@ -51,8 +51,8 @@ class Loader:
             logger.error(f"Reload failed. {e}")
 
     def has_changed(self):
-        logger.info(f"Loader.has_changed called, self.changed is {self.changed}")
         if self.changed:
+            logger.info(f"Loader.has_changed called, self.changed is {self.changed}")
             self.changed = False
             return True
         else:
